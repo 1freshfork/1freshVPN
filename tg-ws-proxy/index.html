@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram без VPN — FreshVPN</title>
+    
+    <!-- Подключение шрифтов Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anonymous+Pro:wght@400;700&family=Jura:wght@400;600;700&family=Montserrat:wght@800;900&family=Rubik:wght@500;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* === БАЗОВЫЕ НАСТРОЙКИ И СБРОС === */
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --border-color: #e0e0e0;
+            --font-display: 'Montserrat', sans-serif;
+            --font-subdisplay: 'Jura', sans-serif;
+            --font-body: 'Work Sans', sans-serif;
+            --font-tech: 'Anonymous Pro', monospace;
+            --font-accent: 'Rubik', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            border-radius: 0 !important;
+        }
+
+        body {
+            background-color: var(--border-color);
+            color: var(--text-color);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        /* === ТИПОГРАФИКА === */
+        .font-display {
+            font-family: var(--font-display);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.03em;
+            line-height: 0.9;
+        }
+
+        .font-subdisplay {
+            font-family: var(--font-subdisplay);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .font-tech {
+            font-family: var(--font-tech);
+            font-size: 0.8rem;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .font-accent {
+            font-family: var(--font-accent);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        /* === СЕТКА И ЛЕЙАУТ === */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            background-color: var(--border-color);
+            gap: 1px;
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        .grid-cell {
+            background-color: var(--bg-color);
+            padding: 2rem;
+            position: relative;
+        }
+
+        .highlight {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            padding: 0 4px;
+        }
+
+        /* === HEADER === */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            font-family: var(--font-tech);
+            font-size: 0.85rem;
+        }
+
+        nav a:hover, nav a.active {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            padding: 2px 6px;
+        }
+
+        /* === HERO SECTION === */
+        .hero {
+            grid-column: 1 / -1;
+            padding: 5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 40vh;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 6rem);
+            word-break: break-word;
+        }
+
+        .hero-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .hero-tagline {
+            font-family: var(--font-subdisplay);
+            font-size: 1.5rem;
+            max-width: 600px;
+        }
+
+        /* === PROXY INFO === */
+        .proxy-intro {
+            grid-column: 1 / -1;
+            padding: 4rem 2rem;
+            font-size: 1.5rem;
+            font-weight: 500;
+            line-height: 1.5;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .proxy-features {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .proxy-feature {
+            padding: 2.5rem 2rem;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .proxy-feature:last-child {
+            border-right: none;
+        }
+
+        .proxy-feature h3 {
+            font-family: var(--font-subdisplay);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .proxy-feature p {
+            font-size: 1rem;
+            color: #333;
+        }
+
+        /* === PROXY CONFIG WINDOW === */
+        .config-section {
+            grid-column: 1 / -1;
+            padding: 4rem 2rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .config-header {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 2rem;
+        }
+
+        .config-header h2 {
+            font-family: var(--font-subdisplay);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* PROXY WINDOW STYLING */
+        .proxy-window {
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--bg-color);
+            border: 2px solid var(--text-color);
+            padding: 0;
+        }
+
+        .proxy-window-header {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .proxy-window-title {
+            font-family: var(--font-subdisplay);
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .proxy-window-close {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--bg-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .proxy-window-close:hover {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .proxy-window-content {
+            padding: 0;
+        }
+
+        .proxy-row {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .proxy-row:last-child {
+            border-bottom: none;
+        }
+
+        .proxy-label {
+            background-color: #f5f5f5;
+            padding: 1.2rem 1.5rem;
+            font-family: var(--font-subdisplay);
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .proxy-value {
+            padding: 1.2rem 1.5rem;
+            font-family: var(--font-tech);
+            font-size: 0.9rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            word-break: break-all;
+        }
+
+        .proxy-status {
+            color: #0066cc;
+        }
+
+        .proxy-actions {
+            padding: 2rem 1.5rem;
+            background-color: #f9f9f9;
+        }
+
+        .btn-connect {
+            width: 100%;
+            padding: 1.2rem;
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            border: none;
+            font-family: var(--font-accent);
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .btn-connect:hover {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 2px solid var(--text-color);
+        }
+
+        .proxy-note {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background-color: #f5f5f5;
+            border: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .proxy-note strong {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-family: var(--font-subdisplay);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        /* === FOOTER & MARQUEE === */
+        .marquee-container {
+            grid-column: 1 / -1;
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            overflow: hidden;
+            white-space: nowrap;
+            padding: 1rem 0;
+            font-family: var(--font-tech);
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .footer-info {
+            grid-column: 1 / -1;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-tech);
+            font-size: 0.8rem;
+            background-color: var(--bg-color);
+        }
+
+        /* === АДАПТИВНОСТЬ (MOBILE) === */
+        @media (max-width: 900px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .proxy-intro, .proxy-features, .proxy-feature {
+                grid-column: 1 / -1;
+                border-right: none;
+            }
+
+            .proxy-features {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                display: none;
+            }
+            
+            header {
+                justify-content: center;
+            }
+
+            .hero-meta {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .proxy-row {
+                grid-template-columns: 1fr;
+            }
+
+            .proxy-label {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 0.8rem 1rem;
+            }
+
+            .proxy-value {
+                padding: 0.8rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="../" class="logo">FRESHVPN</a>
+        <nav>
+            <a href="../about/">[01] О ПРОЕКТЕ</a>
+            <a href="../bot/">[02] НАШ БОТ</a>
+            <a href="../developer/">[03] РАЗРАБОТЧИК</a>
+            <a href="../tg-ws-proxy/" class="active">[04] TG БЕЗ VPN</a>
+        </nav>
+    </header>
+
+    <main class="grid-container">
+        <!-- HERO -->
+        <section class="grid-cell hero">
+            <div class="font-tech">MODULE_ID: TG_WS_PROXY // PROTOCOL: WEBSOCKET</div>
+            <h1 class="font-display hero-title">TELEGRAM<br>БЕЗ VPN</h1>
+            <div class="hero-meta">
+                <p class="hero-tagline">ПОДКЛЮЧАЙТЕСЬ К TELEGRAM ЧЕРЕЗ ПРОКСИ БЕЗ ВКЛЮЧЕНИЯ ПОЛНОЦЕННОГО VPN.</p>
+                <div class="font-tech">
+                    TYPE: MTProto Proxy<br>
+                    PORT: 443/80<br>
+                    SCOPE: TELEGRAM ONLY
+                </div>
+            </div>
+        </section>
+
+        <!-- INTRO -->
+        <section class="grid-cell proxy-intro">
+            <p>WebSocket-прокси позволяет получить доступ к <span class="highlight">Telegram</span> даже при сильных блокировках. Идеально подходит для того, чтобы зайти в мессенджер, оплатить подписку или получить конфиг VPN — без необходимости включать полноценный VPN-клиент.</p>
+        </section>
+
+        <!-- FEATURES -->
+        <section class="grid-cell proxy-features">
+            <div class="proxy-feature">
+                <h3 class="font-subdisplay" style="font-size: 1.1rem;">БЫСТРЫЙ ДОСТУП</h3>
+                <p>Подключение в один клик через Telegram. Не нужно устанавливать дополнительное ПО или настраивать VPN.</p>
+            </div>
+            <div class="proxy-feature">
+                <h3 class="font-subdisplay" style="font-size: 1.1rem;">МИНИМАЛЬНЫЙ РАСХОД</h3>
+                <p>Прокси работает только для Telegram, не влияя на скорость других приложений и не расходуя лишний трафик.</p>
+            </div>
+            <div class="proxy-feature">
+                <h3 class="font-subdisplay" style="font-size: 1.1rem;">ОБХОД БЛОКИРОВОК</h3>
+                <p>Работает через стандартные порты 443/80, что делает его практически невидимым для систем фильтрации.</p>
+            </div>
+        </section>
+
+        <!-- CONFIG SECTION -->
+        <section class="grid-cell config-section">
+            <div class="config-header">
+                <h2 class="font-subdisplay">НАСТРОЙКИ ПРОКСИ</h2>
+                <p class="font-tech">// CLICK TO CONNECT IN TELEGRAM</p>
+            </div>
+
+            <!-- PROXY WINDOW -->
+            <div class="proxy-window">
+                <div class="proxy-window-header">
+                    <span class="proxy-window-title">Прокси-сервер</span>
+                    <span class="proxy-window-close">×</span>
+                </div>
+                <div class="proxy-window-content">
+                    <div class="proxy-row">
+                        <div class="proxy-label">Сервер</div>
+                        <div class="proxy-value">proxy.freshvpn.net</div>
+                    </div>
+                    <div class="proxy-row">
+                        <div class="proxy-label">Порт</div>
+                        <div class="proxy-value">443</div>
+                    </div>
+                    <div class="proxy-row">
+                        <div class="proxy-label">Ключ</div>
+                        <div class="proxy-value">freshvpn_proxy_key_2026_secure</div>
+                    </div>
+                    <div class="proxy-row">
+                        <div class="proxy-label">Статус</div>
+                        <div class="proxy-value proxy-status">Готов к подключению</div>
+                    </div>
+                </div>
+                <div class="proxy-actions">
+                    <a href="https://github.com/Flowseal/tg-ws-proxy" class="btn-connect" target="_blank">
+                        Подключить прокси
+                    </a>
+                    <div class="proxy-note">
+                        <strong>Важно:</strong>
+                        Этот прокси-сервер работает только для Telegram Desktop и мобильных приложений Telegram. При нажатии на кнопку откроется Telegram с окном подключения прокси.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <div class="marquee-container">
+            <div class="marquee-content">
+                FRESHVPN // NO LOGS POLICY // 100 RUB PER MONTH // TELEGRAM STARS ACCEPTED // 24/7 SUPPORT // BUILD 2026.01 // FRESHVPN // NO LOGS POLICY // 100 RUB PER MONTH // TELEGRAM STARS ACCEPTED // 24/7 SUPPORT // BUILD 2026.01 //
+            </div>
+        </div>
+
+        <footer class="grid-cell footer-info">
+            <div>© 2026, FRESHVPN. ALL RIGHTS RESERVED.</div>
+            <div>DEV: <a href="../developer/" style="text-decoration: underline;">FRESHFORK</a></div>
+        </footer>
+    </main>
+
+</body>
+</html>
