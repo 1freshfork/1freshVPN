@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Разработчик — FreshVPN</title>
+    
+    <!-- Подключение шрифтов Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anonymous+Pro:wght@400;700&family=Jura:wght@400;600;700&family=Montserrat:wght@800;900&family=Rubik:wght@500;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* === БАЗОВЫЕ НАСТРОЙКИ И СБРОС === */
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --border-color: #e0e0e0;
+            --font-display: 'Montserrat', sans-serif;
+            --font-subdisplay: 'Jura', sans-serif;
+            --font-body: 'Work Sans', sans-serif;
+            --font-tech: 'Anonymous Pro', monospace;
+            --font-accent: 'Rubik', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            border-radius: 0 !important; /* ЖЕСТКОЕ ТРЕБОВАНИЕ: НИКАКИХ СКРУГЛЕНИЙ */
+        }
+
+        body {
+            background-color: var(--border-color);
+            color: var(--text-color);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        /* === ТИПОГРАФИКА === */
+        .font-display {
+            font-family: var(--font-display);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.03em;
+            line-height: 0.9;
+        }
+
+        .font-subdisplay {
+            font-family: var(--font-subdisplay);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .font-tech {
+            font-family: var(--font-tech);
+            font-size: 0.8rem;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .font-accent {
+            font-family: var(--font-accent);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        /* === СЕТКА И ЛЕЙАУТ === */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            background-color: var(--border-color);
+            gap: 1px; /* Создает идеальные линии толщиной 1px */
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        .grid-cell {
+            background-color: var(--bg-color);
+            padding: 2rem;
+            position: relative;
+        }
+
+        .highlight {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            padding: 0 4px;
+        }
+
+        /* === HEADER === */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            font-family: var(--font-tech);
+            font-size: 0.85rem;
+        }
+
+        nav a:hover, nav a.active {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            padding: 2px 6px;
+        }
+
+        /* === HERO SECTION === */
+        .hero {
+            grid-column: 1 / -1;
+            padding: 5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 40vh;
+        }
+
+        .hero-title {
+            font-size: clamp(3.5rem, 10vw, 8rem);
+            word-break: break-word;
+        }
+
+        .hero-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .hero-tagline {
+            font-family: var(--font-subdisplay);
+            font-size: 1.5rem;
+            max-width: 700px;
+            line-height: 1.3;
+        }
+
+        /* === DEVELOPER CONTENT === */
+        .manifesto {
+            grid-column: 1 / 8;
+            padding: 4rem 2rem;
+            font-size: 1.75rem;
+            font-weight: 500;
+            line-height: 1.4;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .specs {
+            grid-column: 8 / -1;
+            padding: 4rem 2rem;
+            border-top: 1px solid var(--border-color);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .spec-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .spec-label {
+            font-family: var(--font-tech);
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .spec-value {
+            font-family: var(--font-subdisplay);
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .project-focus {
+            grid-column: 1 / -1;
+            padding: 3rem 2rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .project-focus h2 {
+            font-family: var(--font-subdisplay);
+            font-size: 2rem;
+        }
+
+        .project-focus p {
+            max-width: 600px;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        /* === FOOTER & MARQUEE === */
+        .marquee-container {
+            grid-column: 1 / -1;
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            overflow: hidden;
+            white-space: nowrap;
+            padding: 1rem 0;
+            font-family: var(--font-tech);
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .footer-info {
+            grid-column: 1 / -1;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-tech);
+            font-size: 0.8rem;
+            background-color: var(--bg-color);
+        }
+
+        /* === АДАПТИВНОСТЬ (MOBILE) === */
+        @media (max-width: 900px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .manifesto, .specs, .project-focus {
+                grid-column: 1 / -1;
+                border-left: none;
+            }
+
+            nav {
+                display: none;
+            }
+            
+            header {
+                justify-content: center;
+            }
+
+            .hero-meta {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="../" class="logo">FRESHVPN</a>
+        <nav>
+            <a href="../about/">[01] О ПРОЕКТЕ</a>
+            <a href="../bot/">[02] НАШ БОТ</a>
+            <a href="../developer/" class="active">[03] РАЗРАБОТЧИК</a>
+            <a href="../tg-ws-proxy/">[04] TG БЕЗ VPN</a>
+        </nav>
+    </header>
+
+    <main class="grid-container">
+        <!-- HERO -->
+        <section class="grid-cell hero">
+            <h1 class="font-display hero-title">FRESH<br>FORK</h1>
+            <div class="hero-meta">
+                <p class="hero-tagline">ПИШУ ЧИСТЫЙ КОД, ЦЕНЮ ПРИВАТНОСТЬ ПОЛЬЗОВАТЕЛЕЙ ВЫШЕ ВСЕГО.</p>
+                <div class="font-tech">
+                </div>
+            </div>
+        </section>
+
+        <!-- MANIFESTO & SPECS -->
+        <section class="grid-cell manifesto">
+            <p>Архитектура строится на принципах минимализма и безопасности. Никаких лишних зависимостей, никакой телеметрии. Только надежное соединение и защита ваших данных.</p>
+        </section>
+
+        <section class="grid-cell specs">
+            <div class="spec-item">
+                <span class="spec-label">IDENTIFIER</span>
+                <span class="spec-value">FRESHFORK</span>
+            </div>
+            <div class="spec-item">
+                <span class="spec-label">ROLE</span>
+                <span class="spec-value">OWNER & DEVELOPER</span>
+            </div>
+            <div class="spec-item">
+                <span class="spec-label">PRIMARY PROJECT</span>
+                <span class="spec-value">FRESHVPN</span>
+            </div>
+            <div class="spec-item">
+                <span class="spec-label">PHILOSOPHY</span>
+                <span class="spec-value">PRIVACY FIRST</span>
+            </div>
+        </section>
+
+        <!-- PROJECT FOCUS -->
+        <section class="grid-cell project-focus">
+            <h2>ТЕКУЩИЙ ПРОЕКТ</h2>
+            <p>Все ресурсы и разработка сосредоточены на создании и поддержке <span class="highlight">FreshVPN</span>. Мы постоянно оптимизируем маршруты, обновляем серверную инфраструктуру и улучшаем пользовательский опыт внутри Telegram-бота.</p>
+        </section>
+
+        <!-- FOOTER -->
+        <div class="marquee-container">
+            <div class="marquee-content">
+                FRESHVPN // NO LOGS POLICY // 100 RUB PER MONTH // TELEGRAM STARS ACCEPTED // 24/7 SUPPORT // BUILD 2026.01 // FRESHVPN // NO LOGS POLICY // 100 RUB PER MONTH // TELEGRAM STARS ACCEPTED // 24/7 SUPPORT // BUILD 2026.01 //
+            </div>
+        </div>
+
+        <footer class="grid-cell footer-info">
+            <div>© 2026, FRESHVPN. ALL RIGHTS RESERVED.</div>
+            <div>DEV: <span style="text-decoration: underline;">FRESHFORK</span></div>
+        </footer>
+    </main>
+
+</body>
+</html>
