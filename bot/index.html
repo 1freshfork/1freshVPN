@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Наш бот — FreshVPN</title>
+    
+    <!-- Подключение шрифтов Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anonymous+Pro:wght@400;700&family=Jura:wght@400;600;700&family=Montserrat:wght@800;900&family=Rubik:wght@500;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* === БАЗОВЫЕ НАСТРОЙКИ И СБРОС === */
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --border-color: #e0e0e0;
+            --font-display: 'Montserrat', sans-serif;
+            --font-subdisplay: 'Jura', sans-serif;
+            --font-body: 'Work Sans', sans-serif;
+            --font-tech: 'Anonymous Pro', monospace;
+            --font-accent: 'Rubik', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            border-radius: 0 !important; /* ЖЕСТКОЕ ТРЕБОВАНИЕ: НИКАКИХ СКРУГЛЕНИЙ */
+        }
+
+        body {
+            background-color: var(--border-color);
+            color: var(--text-color);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        /* === ТИПОГРАФИКА === */
+        .font-display {
+            font-family: var(--font-display);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.03em;
+            line-height: 0.9;
+        }
+
+        .font-subdisplay {
+            font-family: var(--font-subdisplay);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .font-tech {
+            font-family: var(--font-tech);
+            font-size: 0.8rem;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .font-accent {
+            font-family: var(--font-accent);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        /* === СЕТКА И ЛЕЙАУТ === */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            background-color: var(--border-color);
+            gap: 1px; /* Создает идеальные линии толщиной 1px */
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        .grid-cell {
+            background-color: var(--bg-color);
+            padding: 2rem;
+            position: relative;
+        }
+
+        .marker::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--text-color);
+            margin-right: 12px;
+            vertical-align: middle;
+        }
+
+        .highlight {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            padding: 0 4px;
+        }
+
+        /* === HEADER === */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            font-family: var(--font-tech);
+            font-size: 0.85rem;
+        }
+
+        nav a:hover, nav a.active {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            padding: 2px 6px;
+        }
+
+        /* === HERO SECTION === */
+        .hero {
+            grid-column: 1 / -1;
+            padding: 5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 40vh;
+        }
+
+        .hero-title {
+            font-size: clamp(3.5rem, 10vw, 8rem);
+            word-break: break-word;
+        }
+
+        .hero-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .hero-tagline {
+            font-family: var(--font-subdisplay);
+            font-size: 1.5rem;
+            max-width: 600px;
+        }
+
+        /* === BOT CONTENT === */
+        .bot-intro {
+            grid-column: 1 / -1;
+            padding: 4rem 2rem;
+            font-size: 1.5rem;
+            font-weight: 500;
+            line-height: 1.5;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .features-header {
+            grid-column: 1 / -1;
+            padding: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .feature-card {
+            grid-column: span 6; /* 2 колонки в ряд для баланса */
+            padding: 2.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            border-top: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+
+        .feature-card:hover {
+            background-color: #f5f5f5;
+        }
+
+        .feature-card h3 {
+            font-family: var(--font-subdisplay);
+            font-size: 1.4rem;
+        }
+
+        .feature-card p {
+            font-size: 1rem;
+            color: #333;
+        }
+
+        /* === CTA SECTION === */
+        .cta-section {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .cta-info {
+            padding: 4rem 2rem;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .cta-action {
+            padding: 4rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        .btn {
+            display: inline-block;
+            font-family: var(--font-accent);
+            font-size: 1.1rem;
+            padding: 1.2rem 2.5rem;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--bg-color);
+            margin-top: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: transparent;
+            color: var(--bg-color);
+        }
+
+        .btn-handle {
+            font-family: var(--font-tech);
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.8;
+        }
+
+        /* === FOOTER & MARQUEE === */
+        .marquee-container {
+            grid-column: 1 / -1;
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            overflow: hidden;
+            white-space: nowrap;
+            padding: 1rem 0;
+            font-family: var(--font-tech);
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .footer-info {
+            grid-column: 1 / -1;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-tech);
+            font-size: 0.8rem;
+            background-color: var(--bg-color);
+        }
+
+        /* === АДАПТИВНОСТЬ (MOBILE) === */
+        @media (max-width: 900px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .bot-intro, .feature-card, .cta-info, .cta-action {
+                grid-column: 1 / -1;
+            }
+
+            .cta-section {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-info {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            nav {
+                display: none;
+            }
+            
+            header {
+                justify-content: center;
+            }
+
+            .hero-meta {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .cta-action {
+                align-items: center;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="../" class="logo">FRESHVPN</a>
+        <nav>
+            <a href="../about/">[01] О ПРОЕКТЕ</a>
+            <a href="../bot/" class="active">[02] НАШ БОТ</a>
+            <a href="../developer/">[03] РАЗРАБОТЧИК</a>
+            <a href="../tg-ws-proxy/">[04] TG БЕЗ VPN</a>
+        </nav>
+    </header>
+
+    <main class="grid-container">
+        <!-- HERO -->
+        <section class="grid-cell hero">
+            <h1 class="font-display hero-title">TELEGRAM<br>БОТ</h1>
+            <div class="hero-meta">
+                <p class="hero-tagline">ЦЕНТР УПРАВЛЕНИЯ ВАШЕЙ ПОДПИСКОЙ И ПОДДЕРЖКОЙ В ПАРУ КЛИКОВ.</p>
+                <div class="font-tech">
+                </div>
+            </div>
+        </section>
+
+        <!-- INTRO -->
+        <section class="grid-cell bot-intro">
+            <p>Наш официальный бот — это быстрый и безопасный способ получить доступ к <span class="highlight">FreshVPN</span>. Здесь вы можете оформить подписку, получить конфигурационные файлы для подключения и связаться с технической поддержкой без ожидания.</p>
+        </section>
+
+        <!-- FEATURES -->
+        <div class="grid-cell features-header">
+            <h2 class="font-subdisplay">ФУНКЦИОНАЛ БОТА <span class="font-tech" style="font-size: 0.7rem; color: #888;">// MODULE_02</span></h2>
+        </div>
+        
+        <article class="grid-cell feature-card">
+            <span class="font-tech">FUNC_01</span>
+            <h3 class="marker">МГНОВЕННАЯ ВЫДАЧА</h3>
+            <p>Автоматическая генерация и отправка конфигурационных файлов сразу после оплаты. Никакого ручного ожидания.</p>
+        </article>
+
+        <article class="grid-cell feature-card">
+            <span class="font-tech">FUNC_02</span>
+            <h3 class="marker">УПРАВЛЕНИЕ ПОДПИСКОЙ</h3>
+            <p>Продлевайте доступ, меняйте сервера или проверяйте остаток дней прямо в интерфейсе диалога с ботом.</p>
+        </article>
+
+        <article class="grid-cell feature-card">
+            <span class="font-tech">FUNC_03</span>
+            <h3 class="marker">ТЕХПОДДЕРЖКА 24/7</h3>
+            <p>Встроенная система тикетов. Если что-то пошло не так, наша команда ответит на ваш запрос в кратчайшие сроки.</p>
+        </article>
+
+        <article class="grid-cell feature-card">
+            <span class="font-tech">FUNC_04</span>
+            <h3 class="marker">ОПЛАТА ЗВЁЗДАМИ</h3>
+            <p>Полная интеграция с Telegram Stars. Безопасная и привычная оплата без перехода на сторонние сайты.</p>
+        </article>
+
+        <!-- CTA SECTION -->
+        <section class="grid-cell cta-section">
+            <div class="cta-info">
+                <span class="font-tech">INITIATE_CONNECTION</span>
+                <h2 class="font-subdisplay" style="margin-top: 1rem; font-size: 2rem;">ГОТОВЫ НАЧАТЬ?</h2>
+                <p style="margin-top: 1rem; max-width: 400px;">Нажмите на кнопку ниже, чтобы перейти в диалог с ботом, ознакомиться с тарифами и получить свой первый ключ доступа.</p>
+            </div>
+            <div class="cta-action">
+                <span class="font-tech" style="color: #888;">OFFICIAL HANDLE</span>
+                <div class="btn-handle">@fresh1vpn_bot</div>
+                <a href="https://t.me/fresh1vpn_bot" class="btn" target="_blank">ОТКРЫТЬ БОТА В TELEGRAM</a>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <div class="marquee-container">
+            <div class="marquee-content">
+                FRESHVPN // NO LOGS POLICY // 100 RUB PER MONTH // TELEGRAM STARS ACCEPTED // 24/7 SUPPORT // BUILD 2026.01 // FRESHVPN // NO LOGS POLICY // 100 RUB PER MONTH // TELEGRAM STARS ACCEPTED // 24/7 SUPPORT // BUILD 2026.01 //
+            </div>
+        </div>
+
+        <footer class="grid-cell footer-info">
+            <div>© 2026, FRESHVPN. ALL RIGHTS RESERVED.</div>
+            <div>DEV: <a href="../developer/" style="text-decoration: underline;">FRESHFORK</a></div>
+        </footer>
+    </main>
+
+</body>
+</html>
