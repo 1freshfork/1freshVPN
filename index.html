@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshVPN — Your VPN, your choice.</title>
+
+    <!-- Google Fonts: Montserrat + Source Code Pro + Merriweather -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Source+Code+Pro:wght@400;500;600&family=Merriweather:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+
+    <style>
+        /* ============================
+           CSS VARIABLES & RESET
+           ============================ */
+        :root {
+            --bg-primary: #0a0a0b;
+            --bg-secondary: #111113;
+            --bg-card: #15151a;
+            --bg-elevated: #1c1c22;
+            --text-primary: #f5f5f0;
+            --text-secondary: #8a8a92;
+            --text-muted: #55555c;
+            --accent: #d4ff4d;
+            --accent-soft: rgba(212, 255, 77, 0.12);
+            --accent-glow: rgba(212, 255, 77, 0.35);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.18);
+            --ease: cubic-bezier(0.25, 1, 0.5, 1);
+            --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+            --container: 1320px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+            cursor: none;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+            cursor: none;
+        }
+
+        button {
+            cursor: none;
+            font-family: inherit;
+            border: none;
+            background: none;
+            color: inherit;
+        }
+
+        img {
+            max-width: 100%;
+            display: block;
+        }
+
+        ::selection {
+            background: var(--accent);
+            color: var(--bg-primary);
+        }
+
+        /* subtle noise / grain overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        /* ============================
+           CUSTOM CURSOR
+           ============================ */
+        .cursor-dot,
+        .cursor-ring {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 9999;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            will-change: transform;
+        }
+
+        .cursor-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            transition: width 0.3s var(--ease), height 0.3s var(--ease), background 0.3s var(--ease);
+        }
+
+        .cursor-ring {
+            width: 36px;
+            height: 36px;
+            border: 1px solid rgba(212, 255, 77, 0.5);
+            transition: width 0.4s var(--ease), height 0.4s var(--ease), border-color 0.4s var(--ease), background 0.4s var(--ease);
+        }
+
+        .cursor-ring.hover {
+            width: 64px;
+            height: 64px;
+            background: var(--accent-soft);
+            border-color: var(--accent);
+        }
+
+        .cursor-dot.hover {
+            width: 0;
+            height: 0;
+        }
+
+        @media (max-width: 768px) {
+            body { cursor: auto; }
+            a, button { cursor: pointer; }
+            .cursor-dot, .cursor-ring { display: none; }
+        }
+
+        /* ============================
+           LAYOUT HELPERS
+           ============================ */
+        .container {
+            max-width: var(--container);
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        .mono {
+            font-family: 'Source Code Pro', monospace;
+            letter-spacing: 0.02em;
+        }
+
+        .serif {
+            font-family: 'Merriweather', serif;
+        }
+
+        .accent {
+            color: var(--accent);
+        }
+
+        /* ============================
+           NAVBAR
+           ============================ */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 22px 0;
+            background: rgba(10, 10, 11, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.5s var(--ease), padding 0.5s var(--ease);
+        }
+
+        .navbar.scrolled {
+            padding: 14px 0;
+            border-bottom-color: var(--border);
+        }
+
+        .navbar .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo h1 {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h1::before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 16px var(--accent-glow);
+            animation: pulse 2.4s var(--ease) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.85); }
+        }
+
+        .links {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .links a {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            position: relative;
+            transition: color 0.4s var(--ease);
+        }
+
+        .links a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -6px;
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: width 0.5s var(--ease);
+        }
+
+        .links a:hover {
+            color: var(--text-primary);
+        }
+
+        .links a:hover::after {
+            width: 100%;
+        }
+
+        /* ============================
+           BANNER / HERO
+           ============================ */
+        .banner {
+            min-height: 100vh;
+            padding: 160px 0 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ambient gradient blobs */
+        .banner::before,
+        .banner::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.35;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .banner::before {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--accent-glow), transparent 70%);
+            top: -200px;
+            right: -200px;
+        }
+
+        .banner::after {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(100, 140, 255, 0.15), transparent 70%);
+            bottom: -150px;
+            left: -150px;
+        }
+
+        .banner .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .banner .date {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Source Code Pro', monospace;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            background: rgba(255, 255, 255, 0.02);
+            width: fit-content;
+        }
+
+        .banner .date::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        .banner .status {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 14px;
+            color: var(--accent);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .banner .status::before {
+            content: '';
+            width: 40px;
+            height: 1px;
+            background: var(--accent);
+        }
+
+        .banner h1 {
+            font-size: clamp(48px, 9vw, 140px);
+            font-weight: 800;
+            line-height: 0.95;
+            letter-spacing: -0.04em;
+            margin-bottom: 40px;
+            max-width: 1100px;
+        }
+
+        .banner h1 .italic {
+            font-family: 'Merriweather', serif;
+            font-style: italic;
+            font-weight: 300;
+            color: var(--accent);
+        }
+
+        .banner .signature {
+            font-family: 'Merriweather', serif;
+            font-style: italic;
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 500px;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Source Code Pro', monospace;
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .scroll-indicator::after {
+            content: '';
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--text-muted), transparent);
+            animation: scrollLine 2s var(--ease) infinite;
+        }
+
+        @keyframes scrollLine {
+            0% { transform: scaleY(0); transform-origin: top; }
+            50% { transform: scaleY(1); transform-origin: top; }
+            51% { transform-origin: bottom; }
+            100% { transform: scaleY(0); transform-origin: bottom; }
+        }
+
+        /* ============================
+           SECTION BASE
+           ============================ */
+        section {
+            padding: 140px 0;
+            position: relative;
+        }
+
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Source Code Pro', monospace;
+            font-size: 12px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 28px;
+        }
+
+        .section-label::before {
+            content: '';
+            width: 24px;
+            height: 1px;
+            background: var(--accent);
+        }
+
+        .section-title {
+            font-size: clamp(36px, 5.5vw, 72px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.05;
+            margin-bottom: 40px;
+            max-width: 900px;
+        }
+
+        /* ============================
+           ABOUT MINI
+           ============================ */
+        .about-mini {
+            border-top: 1px solid var(--border);
+        }
+
+        .about-mini .content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 80px;
+            align-items: start;
+        }
+
+        .about-mini h1 {
+            font-size: clamp(32px, 4vw, 56px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        .about-mini p {
+            font-family: 'Merriweather', serif;
+            font-size: clamp(18px, 1.6vw, 24px);
+            line-height: 1.6;
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+
+        .about-mini p strong {
+            color: var(--text-primary);
+            font-weight: 400;
+        }
+
+        /* ============================
+           PRICES
+           ============================ */
+        .prices {
+            border-top: 1px solid var(--border);
+        }
+
+        .prices-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 60px;
+        }
+
+        .price-rate {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 48px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.6s var(--ease);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .price-rate::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), var(--accent-soft), transparent 40%);
+            opacity: 0;
+            transition: opacity 0.5s var(--ease);
+            pointer-events: none;
+        }
+
+        .price-rate:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-4px);
+        }
+
+        .price-rate:hover::before {
+            opacity: 1;
+        }
+
+        .price-rate.featured {
+            background: linear-gradient(180deg, #1a1d14 0%, #15151a 100%);
+            border-color: rgba(212, 255, 77, 0.25);
+        }
+
+        .price-rate.featured::after {
+            content: 'RECOMMENDED';
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            font-family: 'Source Code Pro', monospace;
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            padding: 6px 12px;
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-radius: 100px;
+            font-weight: 600;
+        }
+
+        .price-rate .plan-name {
+            font-family: 'Merriweather', serif;
+            font-style: italic;
+            font-size: 22px;
+            font-weight: 300;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .price-rate .price {
+            font-size: clamp(64px, 7vw, 96px);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .price-rate.featured .price {
+            color: var(--accent);
+        }
+
+        .price-rate .duration {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 13px;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 40px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .plus, .minus {
+            margin-bottom: 24px;
+            flex: 1;
+        }
+
+        .plus > p:first-child,
+        .minus > p:first-child {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .plus > p:first-child { color: var(--accent); }
+        .minus > p:first-child { color: var(--text-muted); }
+
+        .plus p:not(:first-child),
+        .minus p:not(:first-child) {
+            font-size: 15px;
+            color: var(--text-secondary);
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            line-height: 1.5;
+        }
+
+        .plus p:not(:first-child)::before {
+            content: '+';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .minus p:not(:first-child) {
+            color: var(--text-muted);
+        }
+
+        .minus p:not(:first-child)::before {
+            content: '—';
+            position: absolute;
+            left: 0;
+            color: var(--text-muted);
+        }
+
+        /* Price card buttons */
+        .price-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border);
+        }
+
+        .price-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            transition: all 0.5s var(--ease);
+            text-align: center;
+            width: 100%;
+        }
+
+        .price-btn-primary {
+            background: var(--accent);
+            color: var(--bg-primary);
+        }
+
+        .price-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px -10px var(--accent-glow);
+        }
+
+        .price-btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .price-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--border-hover);
+        }
+
+        .price-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* ============================
+           PRICE CHART
+           ============================ */
+        .price-chart {
+            border-top: 1px solid var(--border);
+        }
+
+        .chart-wrapper {
+            margin-top: 60px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .chart-header .current-price {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--accent);
+            line-height: 1;
+        }
+
+        .chart-header .current-price small {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 400;
+            display: block;
+            margin-top: 8px;
+            font-family: 'Source Code Pro', monospace;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .chart-header .change {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 13px;
+            color: var(--text-secondary);
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+        }
+
+        .chart-svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .chart-svg .grid-line {
+            stroke: var(--border);
+            stroke-width: 1;
+            stroke-dasharray: 2 6;
+        }
+
+        .chart-svg .axis-label {
+            fill: var(--text-muted);
+            font-family: 'Source Code Pro', monospace;
+            font-size: 11px;
+        }
+
+        .chart-svg .price-line {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0 0 8px var(--accent-glow));
+        }
+
+        .chart-svg .price-area {
+            fill: url(#areaGradient);
+        }
+
+        .chart-svg .data-point {
+            fill: var(--bg-primary);
+            stroke: var(--accent);
+            stroke-width: 2;
+            transition: all 0.3s var(--ease);
+        }
+
+        .chart-svg .data-point:hover {
+            r: 8;
+            fill: var(--accent);
+        }
+
+        .chart-svg .point-label {
+            fill: var(--text-primary);
+            font-family: 'Source Code Pro', monospace;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .chart-svg .point-date {
+            fill: var(--text-muted);
+            font-family: 'Source Code Pro', monospace;
+            font-size: 10px;
+        }
+
+        /* ============================
+           BOT / CTA
+           ============================ */
+        .bot {
+            border-top: 1px solid var(--border);
+        }
+
+        .start {
+            background: linear-gradient(135deg, #1a1d14 0%, #111113 100%);
+            border: 1px solid rgba(212, 255, 77, 0.15);
+            border-radius: 32px;
+            padding: 80px;
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 80px;
+            align-items: center;
+            position: relative;
+            overflow: visible;
+        }
+
+        .start::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--accent-glow), transparent 60%);
+            opacity: 0.3;
+            filter: blur(80px);
+            pointer-events: none;
+        }
+
+        .start .image-wrapper {
+            position: relative;
+            z-index: 2;
+            border-radius: 20px;
+            overflow: visible;
+            border: none;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .start .image-wrapper img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            border-radius: 16px;
+        }
+
+        .start .text {
+            position: relative;
+            z-index: 2;
+        }
+
+        .start .text h1 {
+            font-size: clamp(36px, 4.5vw, 64px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.05;
+            margin-bottom: 24px;
+        }
+
+        .start .text h1 .italic {
+            font-family: 'Merriweather', serif;
+            font-style: italic;
+            font-weight: 300;
+            color: var(--accent);
+        }
+
+        .start .text > p {
+            font-family: 'Merriweather', serif;
+            font-size: 18px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin-bottom: 48px;
+            max-width: 480px;
+        }
+
+        .start-button a {
+            display: inline-block;
+        }
+
+        .start-button button {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            padding: 20px 36px;
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-radius: 100px;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            transition: all 0.5s var(--ease);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .start-button button::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s var(--ease);
+        }
+
+        .start-button button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px -10px var(--accent-glow);
+        }
+
+        .start-button button:hover::before {
+            transform: translateX(100%);
+        }
+
+        .start-button button img {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* ============================
+           FOOTER
+           ============================ */
+        .footer {
+            padding: 60px 0 40px;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer p {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 13px;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+        }
+
+        .footer .made {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer .made::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        /* ============================
+           SCROLL REVEAL
+           ============================ */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1s var(--ease-out), transform 1s var(--ease-out);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+
+        /* ============================
+           RESPONSIVE
+           ============================ */
+        @media (max-width: 968px) {
+            .container { padding: 0 24px; }
+            section { padding: 100px 0; }
+
+            .links { gap: 24px; }
+            .links a { font-size: 13px; }
+
+            .about-mini .content {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .prices-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .price-rate { padding: 36px; }
+
+            .chart-wrapper { padding: 32px 24px; }
+            .chart-header .current-price { font-size: 36px; }
+
+            .start {
+                grid-template-columns: 1fr;
+                padding: 48px 32px;
+                gap: 40px;
+            }
+
+            .start .image-wrapper {
+                max-width: 100%;
+                margin: 0 auto;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .container { padding: 0 20px; }
+            .navbar { padding: 16px 0; }
+            .logo h1 { font-size: 16px; }
+            .links { gap: 18px; }
+            .links a { font-size: 12px; }
+
+            .banner { padding: 120px 0 60px; }
+            .banner .date { font-size: 11px; padding: 6px 12px; }
+
+            .price-rate { padding: 28px; border-radius: 20px; }
+            .price-rate .price { font-size: 56px; }
+
+            .start { padding: 36px 24px; border-radius: 24px; }
+            .start-button button { padding: 16px 28px; font-size: 14px; }
+
+            .price-buttons { margin-top: 24px; padding-top: 24px; }
+            .price-btn { padding: 14px 20px; font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Custom cursor -->
+    <div class="cursor-ring"></div>
+    <div class="cursor-dot"></div>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <h1>FRESHVPN</h1>
+            </div>
+            <div class="links">
+                <a href="servers/">Сервера</a>
+                <a href="sub/">Подписки</a>
+                <a href="about/">О проекте</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- BANNER / HERO -->
+    <section class="banner">
+        <div class="container">
+            <div class="date reveal">
+                <span>Jun 14, 2026</span>
+            </div>
+            <div class="status reveal reveal-delay-1">Серверы работают</div>
+            <h1 class="reveal reveal-delay-2" data-parallax="0.05">
+                Your VPN,<br>
+                your <span class="italic">choice.</span>
+            </h1>
+            <p class="signature reveal reveal-delay-3">— freshfork, 2026.</p>
+        </div>
+        <div class="scroll-indicator">Scroll</div>
+    </section>
+
+    <!-- ABOUT MINI -->
+    <section class="about-mini">
+        <div class="container">
+            <div class="content">
+                <div class="reveal">
+                    <div class="section-label">01 / About</div>
+                    <h1>О нашем VPN</h1>
+                </div>
+                <div class="reveal reveal-delay-1">
+                    <p>
+                        <strong>freshVPN</strong> — VPN сервис, дающий полный контроль над вашей сетью.
+                        Наш сервис даёт ссылку для подключения в клиент, а вы вставляете её в клиент.
+                        FreshVPN способен <strong>обходить глушилки связи</strong> на территории РФ.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRICES -->
+    <section class="prices">
+        <div class="container">
+            <div class="reveal">
+                <div class="section-label">02 / Pricing</div>
+                <h2 class="section-title">Выберите свой путь.</h2>
+            </div>
+
+            <div class="prices-grid">
+                <!-- Free tier -->
+                <div class="price-rate reveal reveal-delay-1">
+                    <p class="plan-name">«Попробую»</p>
+                    <h2 class="price">0₽</h2>
+                    <p class="duration">7 дней</p>
+                    <div class="plus">
+                        <p>Плюсы</p>
+                        <p>Бесплатно</p>
+                        <p>Даётся на неделю</p>
+                        <p>2 сервера из платной подписки</p>
+                    </div>
+                    <div class="minus">
+                        <p>Минусы</p>
+                        <p>Медленная скорость</p>
+                        <p>Возможны сбои, высокий пинг</p>
+                        <p>Ваши данные могут быть в небезопасности</p>
+                        <p>Вы не поддерживаете freshfork</p>
+                    </div>
+                    <div class="price-buttons">
+                        <a href="https://t.me/fresh1vpn_bot" class="price-btn price-btn-primary">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            Попробовать
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Paid tier -->
+                <div class="price-rate featured reveal reveal-delay-2">
+                    <p class="plan-name">«Мне понравилось»</p>
+                    <h2 class="price">100₽</h2>
+                    <p class="duration">1 месяц</p>
+                    <div class="plus">
+                        <p>Плюсы</p>
+                        <p>Высокая скорость</p>
+                        <p>Бесконечность устройств</p>
+                        <p>около 46 серверов</p>
+                        <p>Высокий uptime</p>
+                        <p>Работают все нейросети (включая gemini, chatgpt)</p>
+                    </div>
+                    <div class="minus">
+                        <p>Минусы</p>
+                        <p>их нету</p>
+                    </div>
+                    <div class="price-buttons">
+                        <a href="https://t.me/fresh1vpn_bot" class="price-btn price-btn-primary">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                            Купить
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRICE CHART -->
+    <section class="price-chart">
+        <div class="container">
+            <div class="reveal">
+                <div class="section-label">03 / History</div>
+                <h2 class="section-title">Как менялась цена</h2>
+            </div>
+
+            <div class="chart-wrapper reveal reveal-delay-1">
+                <div class="chart-header">
+                    <div>
+                        <div class="current-price">100₽ <small>за месяц · сейчас</small></div>
+                    </div>
+                    <div class="change">+67% за 33 дня</div>
+                </div>
+
+                <svg class="chart-svg" viewBox="0 0 800 320" preserveAspectRatio="xMidYMid meet">
+                    <defs>
+                        <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#d4ff4d" stop-opacity="0.25"/>
+                            <stop offset="100%" stop-color="#d4ff4d" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Grid lines -->
+                    <line class="grid-line" x1="60" y1="60" x2="760" y2="60"/>
+                    <line class="grid-line" x1="60" y1="140" x2="760" y2="140"/>
+                    <line class="grid-line" x1="60" y1="220" x2="760" y2="220"/>
+
+                    <!-- Y axis labels -->
+                    <text class="axis-label" x="40" y="64" text-anchor="end">100₽</text>
+                    <text class="axis-label" x="40" y="144" text-anchor="end">80₽</text>
+                    <text class="axis-label" x="40" y="224" text-anchor="end">60₽</text>
+
+                    <!-- Area under curve -->
+                    <path class="price-area" d="M 80,220 C 180,220 220,210 280,170 S 420,90 500,60 L 720,60 L 720,260 L 80,260 Z"/>
+
+                    <!-- Price line -->
+                    <path class="price-line" d="M 80,220 C 180,220 220,210 280,170 S 420,90 500,60 L 720,60"/>
+
+                    <!-- Data points -->
+                    <circle class="data-point" cx="80" cy="220" r="5"/>
+                    <circle class="data-point" cx="280" cy="170" r="5"/>
+                    <circle class="data-point" cx="500" cy="60" r="5"/>
+                    <circle class="data-point" cx="720" cy="60" r="5"/>
+
+                    <!-- Point labels (price) -->
+                    <text class="point-label" x="80" y="200" text-anchor="middle">60₽</text>
+                    <text class="point-label" x="280" y="150" text-anchor="middle">85₽</text>
+                    <text class="point-label" x="500" y="40" text-anchor="middle">100₽</text>
+                    <text class="point-label" x="720" y="40" text-anchor="middle">100₽</text>
+
+                    <!-- Date labels -->
+                    <text class="point-date" x="80" y="290" text-anchor="middle">12.05</text>
+                    <text class="point-date" x="280" y="290" text-anchor="middle">23.05</text>
+                    <text class="point-date" x="500" y="290" text-anchor="middle">01.06</text>
+                    <text class="point-date" x="720" y="290" text-anchor="middle">14.06</text>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- BOT / CTA -->
+    <section class="bot">
+        <div class="container">
+            <div class="start reveal">
+                <div class="image-wrapper">
+                    <img src="files/start-message.png" alt="Start message">
+                </div>
+                <div class="text">
+                    <div class="section-label">04 / Start</div>
+                    <h1>Начни новый путь <span class="italic">со мной</span></h1>
+                    <p>Нажми /start в нашем боте, и начни новый путь с новым IP со мной!</p>
+                    <div class="start-button">
+                        <a href="https://t.me/fresh1vpn_bot">
+                            <button>
+                                <img src="files/telegram-ico.png" alt="">
+                                <p>Перейти в бота</p>
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <p>2026, freshVPN.</p>
+            <p class="made">by freshfork</p>
+        </div>
+    </footer>
+
+    <script>
+        /* ============================
+           CUSTOM CURSOR
+           ============================ */
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorRing = document.querySelector('.cursor-ring');
+        let mouseX = 0, mouseY = 0;
+        let ringX = 0, ringY = 0;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+        });
+
+        // плавное следование кольца с задержкой
+        function animateRing() {
+            ringX += (mouseX - ringX) * 0.15;
+            ringY += (mouseY - ringY) * 0.15;
+            cursorRing.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+            requestAnimationFrame(animateRing);
+        }
+        animateRing();
+
+        // hover-эффект на кликабельных элементах
+        const hoverables = document.querySelectorAll('a, button, .price-rate, .data-point, .price-btn');
+        hoverables.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursorRing.classList.add('hover');
+                cursorDot.classList.add('hover');
+            });
+            el.addEventListener('mouseleave', () => {
+                cursorRing.classList.remove('hover');
+                cursorDot.classList.remove('hover');
+            });
+        });
+
+        /* ============================
+           NAVBAR SCROLL STATE
+           ============================ */
+        const navbar = document.querySelector('.navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 40) navbar.classList.add('scrolled');
+            else navbar.classList.remove('scrolled');
+        });
+
+        /* ============================
+           SCROLL REVEAL (Intersection Observer)
+           ============================ */
+        const revealElements = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+
+        revealElements.forEach(el => observer.observe(el));
+
+        /* ============================
+           PARALLAX (subtle mouse follow)
+           ============================ */
+        const parallaxEls = document.querySelectorAll('[data-parallax]');
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 2;
+            const y = (e.clientY / window.innerHeight - 0.5) * 2;
+            parallaxEls.forEach(el => {
+                const strength = parseFloat(el.dataset.parallax) || 0.05;
+                const tx = x * 30 * strength * 10;
+                const ty = y * 20 * strength * 10;
+                el.style.transform = `translate(${tx}px, ${ty}px)`;
+            });
+        });
+
+        /* ============================
+           PRICE CARD SPOTLIGHT (follow mouse)
+           ============================ */
+        document.querySelectorAll('.price-rate').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                card.style.setProperty('--mx', x + '%');
+                card.style.setProperty('--my', y + '%');
+            });
+        });
+
+        /* ============================
+           CHART LINE DRAW ANIMATION
+           ============================ */
+        const priceLine = document.querySelector('.price-line');
+        if (priceLine) {
+            const length = priceLine.getTotalLength();
+            priceLine.style.strokeDasharray = length;
+            priceLine.style.strokeDashoffset = length;
+            priceLine.style.transition = 'none';
+
+            const chartObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        priceLine.style.transition = 'stroke-dashoffset 2s cubic-bezier(0.25, 1, 0.5, 1)';
+                        priceLine.style.strokeDashoffset = '0';
+                        chartObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            chartObserver.observe(document.querySelector('.chart-wrapper'));
+        }
+    </script>
+</body>
+</html>
